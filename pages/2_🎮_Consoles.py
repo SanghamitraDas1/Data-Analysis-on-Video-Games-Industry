@@ -21,8 +21,7 @@ def place_gif():
     st.subheader('Please select a Console from the sidebar!')
     gif_image = "images/giffas_pacman.gif"
     st.image(gif_image)
-
-@st.cache_data    
+  
 def create_wordcloud(review):
     value=review["Cleaned Review"]
     wordcloud = WordCloud(
@@ -43,13 +42,11 @@ def create_wordcloud(review):
     fig=plt.show()
     return fig 
 
-@st.cache_data
 def generate_ngrams(words, n_gram=1):
     token = [token for token in words.lower().split(" ") if token != "" if token not in STOPWORDS]
     ngrams = zip(*[token[i:] for i in range(n_gram)])
     return[" ".join(ngram) for ngram in ngrams]
 
-@st.cache_data
 def horizontal_bar_chart(df,color):
     trace = alt.Chart(df).mark_bar(color=color).encode(
         y=df["word"],
@@ -57,7 +54,6 @@ def horizontal_bar_chart(df,color):
     )
     return trace
 
-@st.cache_data
 def create_bar_chart(review, bar_color):
     freq_dict = defaultdict(int)
     for sent in review["Cleaned Review"]:
@@ -74,7 +70,6 @@ def create_bar_chart(review, bar_color):
     )   
     return bar_chart 
 
-@st.cache_data
 def create_console_sales_chart(chosen_console,color):
     sales = pd.read_csv("files/console_sales.csv")
     console_sales = sales[sales["Console"]==chosen_console]
@@ -160,7 +155,6 @@ with tab3:
         df.reset_index(inplace=True)
         df.drop('index', axis=1, inplace=True)
         
-        @st.cache_data
         def deEmojify(x):
             regress_pattern =re.compile(pattern = "["
                                         u"\U0001F600-\U0001F64F" #emoticons
@@ -170,7 +164,6 @@ with tab3:
                                         "]+", flags = re.UNICODE)
             return regress_pattern.sub(r'', x)
         
-        @st.cache_data
         def review_cleaning(text):
             '''Make text lower case, remove text in square brackets, remove links, remove punctuation and remove words containg numbers.'''
             text = str(text).lower()
@@ -184,7 +177,6 @@ with tab3:
             text = text.strip()
             return text
         
-        @st.cache_data
         def f(row):
             '''This function returns sentiment value based on the overall ratings from user'''
             if row['Ratings'] == 3.0:
@@ -266,6 +258,6 @@ with tab4:
     elif console == "🍄Nintendo Switch":
         ns_sales_chart = create_console_sales_chart("Nintendo Switch (NS)",'#8c75e4')
         st.write(ns_sales_chart)
-        
+
     else:
         pass

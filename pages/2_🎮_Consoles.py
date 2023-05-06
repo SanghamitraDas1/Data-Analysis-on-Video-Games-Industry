@@ -3,16 +3,11 @@ import streamlit as st
 import re
 import string
 from textblob import TextBlob
-#from plotly.offline import iplot
 import altair as alt
 from wordcloud import WordCloud, STOPWORDS
 from collections import defaultdict
-#import plotly
 import matplotlib.pyplot as plt
-from matplotlib import rcParams
-#import seaborn as sns
-#from plotly import tools
-#import base64
+
 
 st.set_page_config(layout='wide')
 st.set_option('deprecation.showPyplotGlobalUse', False)
@@ -26,7 +21,8 @@ def place_gif():
     st.subheader('Please select a Console from the sidebar!')
     gif_image = "images/giffas_pacman.gif"
     st.image(gif_image)
-    
+
+@st.cache_data    
 def create_wordcloud(review):
     value=review["Cleaned Review"]
     wordcloud = WordCloud(
@@ -46,12 +42,14 @@ def create_wordcloud(review):
     fig=plt.tight_layout(pad=0)
     fig=plt.show()
     return fig 
+
 @st.cache_data
 def generate_ngrams(words, n_gram=1):
     token = [token for token in words.lower().split(" ") if token != "" if token not in STOPWORDS]
     ngrams = zip(*[token[i:] for i in range(n_gram)])
     return[" ".join(ngram) for ngram in ngrams]
 
+@st.cache_data
 def horizontal_bar_chart(df,color):
     trace = alt.Chart(df).mark_bar(color=color).encode(
         y=df["word"],
@@ -59,6 +57,7 @@ def horizontal_bar_chart(df,color):
     )
     return trace
 
+@st.cache_data
 def create_bar_chart(review, bar_color):
     freq_dict = defaultdict(int)
     for sent in review["Cleaned Review"]:
@@ -75,7 +74,7 @@ def create_bar_chart(review, bar_color):
     )   
     return bar_chart 
 
-
+@st.cache_data
 def create_console_sales_chart(chosen_console,color):
     sales = pd.read_csv("files/console_sales.csv")
     console_sales = sales[sales["Console"]==chosen_console]
@@ -85,8 +84,6 @@ def create_console_sales_chart(chosen_console,color):
     console_sales_chart = alt.Chart(new_console_sales).mark_bar(color=color).encode(
         x=alt.X('variable', title = 'Region',sort=alt.EncodingSortField(field="variable", op='count')),
         y=alt.Y('value', title='Sales in millions (USD)')
-        # color=color
-        #color=alt.Color('value', scale=alt.Scale(scheme='redyellowgreen'))
         ).properties(
              width=800,
              height=400
@@ -159,14 +156,11 @@ with tab3:
         place_gif()
     else:
         df = pd.read_csv(reviews.get(console))
-        #st.write(df.isna().sum())
         df.dropna(inplace=True)
-        #st.write(df.isna().sum())
         df.reset_index(inplace=True)
-        #st.write(df.tail())
         df.drop('index', axis=1, inplace=True)
-        #st.write(df.tail())
-
+        
+        @st.cache_data
         def deEmojify(x):
             regress_pattern =re.compile(pattern = "["
                                         u"\U0001F600-\U0001F64F" #emoticons
@@ -176,6 +170,7 @@ with tab3:
                                         "]+", flags = re.UNICODE)
             return regress_pattern.sub(r'', x)
         
+        @st.cache_data
         def review_cleaning(text):
             '''Make text lower case, remove text in square brackets, remove links, remove punctuation and remove words containg numbers.'''
             text = str(text).lower()
@@ -189,6 +184,7 @@ with tab3:
             text = text.strip()
             return text
         
+        @st.cache_data
         def f(row):
             '''This function returns sentiment value based on the overall ratings from user'''
             if row['Ratings'] == 3.0:
@@ -211,19 +207,12 @@ with tab3:
         sentiment_choice=st.multiselect("Choose the sentiment",sentiments)
         viz_selection=st.radio("Select your viz",['Wordcloud','Bar Chart'])
         
-        if viz_selection=='Wordcloud':
-
-            #st.write(df)
-            # sentiments = ["Positive","Negative"]
-            # sentiment_choice=st.multiselect("Choose a sentiment",sentiments)
-            
+        if viz_selection=='Wordcloud':          
             if sentiment_choice == ["Positive"]:
                 review_pos = df[df["Sentiment"]=='Positive'].dropna()
                 fig_pos = create_wordcloud(review_pos)
                 st.pyplot(fig_pos,use_container_width=False)
-                # st.image(,width=2)
-
-            
+                            
             elif sentiment_choice == ["Negative"]:
                 review_neg = df[df["Sentiment"]=='Negative'].dropna()
                 fig_neg = create_wordcloud(review_neg)
@@ -236,7 +225,6 @@ with tab3:
                 st.pyplot(fig_pos,use_container_width=False)
                 fig_neg = create_wordcloud(review_neg)
                 st.pyplot(fig_neg,use_container_width=False)
-            
             
             else:
                 pass
@@ -254,7 +242,6 @@ with tab3:
                 bar_chart_neg = create_bar_chart(review_neg, 'orange')
                 st.write(bar_chart_neg)
 
-
             elif set(sentiment_choice) == set(sentiments):
                 bar_chart_pos = create_bar_chart(review_pos, 'blue')
                 st.write(bar_chart_pos)
@@ -267,6 +254,7 @@ with tab3:
 with tab4:
     if reviews.get(console) == " ":
         place_gif()
+
     if console == '🤖Playstation5':
         ps5_sales_chart = create_console_sales_chart("PlayStation 5 (PS5)",'#003791')
         st.write(ps5_sales_chart)
@@ -278,5 +266,6 @@ with tab4:
     elif console == "🍄Nintendo Switch":
         ns_sales_chart = create_console_sales_chart("Nintendo Switch (NS)",'#8c75e4')
         st.write(ns_sales_chart)
+        
     else:
         pass

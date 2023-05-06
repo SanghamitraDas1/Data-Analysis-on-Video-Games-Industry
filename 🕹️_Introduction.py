@@ -1,10 +1,9 @@
-import pandas as pd
 import streamlit as st
 
 st.set_page_config(layout='wide')
 st.title("Introduction to the Gaming Industry")
 tab1, tab2 = st.tabs(["Introduction", "About this App"])
-#need to add images
+
 with tab1:
     col1, col2 = st.columns(2)
     with col1:
@@ -12,8 +11,7 @@ with tab1:
         st.image(image)
     with col2:
         st.markdown("The gaming industry refers to the business of creating, designing, producing, publishing, and distributing video games. Video games have become a popular form of entertainment around the world and have evolved over the years from simple, pixelated games to complex, immersive experiences that often rival movies and television shows in terms of production value and storytelling.")
-    #intro_text = open(intro,"r").read()
-    #st.write(intro_text)
+    
     st.markdown("The gaming industry includes a variety of companies, including:")
     st.markdown(" - Game developers, who create the games themselves")
     st.markdown(" - Publishers, who handle the marketing, distribution, and sales of the games")
@@ -36,7 +34,6 @@ with tab1:
 
 with tab2:
     st.write("This app provides us insights into the latest consoles in the market today, namely, PS5, XBox Series X and NS. We also take a closer look at the top rated games, sales and ratings across all platforms.")
-    #st.write("We will also look into PC gaming as a platform. However, since PC gaming itself is so vast, we will look at it separately")
     st.header("About the Data")
     st.write("For the latest console data we look at Amazon reviews")
     st.write("For the top rated games and sales data we will use vgchartz.com as our source")
